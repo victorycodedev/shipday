@@ -19,7 +19,7 @@ trait MakeRequest
         }
 
         //if $response->getBody() is empty, empty array will be returned
-        if (empty($response->getBody())) {
+        if (empty(json_decode($response->getBody(), true))) {
             return [];
         }
 
