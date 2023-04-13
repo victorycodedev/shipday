@@ -4,7 +4,7 @@ namespace Victorycodedev\Shipday;
 
 interface DeliveryProvider
 {
-    // insert order 
+    // insert order
     public function insertOrder(array $payload): array;
 
     //update order
@@ -13,7 +13,7 @@ interface DeliveryProvider
     //active orders
     public function getActiveOrders(): array;
 
-    //order details 
+    //order details
     public function getOrderDetails(string $orderId): array;
 
     //query order
@@ -31,7 +31,7 @@ interface DeliveryProvider
     // ready to pickup
     public function readyToPickup(string $orderId): array;
 
-    //add driver 
+    //add driver
     public function addDriver(array $payload): array;
 
     // list of drivers

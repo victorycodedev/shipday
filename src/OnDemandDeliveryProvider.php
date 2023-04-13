@@ -7,13 +7,13 @@ interface OnDemandDeliveryProvider
     //Get a list of 3rd party delivery service providers available
     public function services(): array;
 
-    //estimate 
+    //estimate
     public function estimate(string $orderId): array;
 
     //Assign to a specific 3rd party delivery service provider. Usually, after getting an estimate.
     public function assign(array $payload): array;
 
-    //get details 
+    //get details
     public function getDetails(string $orderId): array;
 
     //Cancel an assigned order from 3rd party service provider
