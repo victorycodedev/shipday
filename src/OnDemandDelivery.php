@@ -9,7 +9,6 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
     use MakeRequest;
     /**
      * GuzzleHttp Client.
-     *
      */
     protected Client $client;
 
@@ -26,9 +25,9 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
         ]);
     }
 
-
     /**
-     * Get a list of 3rd party delivery service providers available
+     * Get a list of 3rd party delivery service providers available.
+     *
      * @return array
      */
     public function services(): array
@@ -37,8 +36,10 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
     }
 
     /**
-     * Estimate
+     * Estimate.
+     *
      * @param string $orderId
+     *
      * @return array
      */
     public function estimate(string $orderId): array
@@ -47,8 +48,10 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
     }
 
     /**
-     * Assign to a specific 3rd party delivery service provider. 
+     * Assign to a specific 3rd party delivery service provider.
+     *
      * @param array $payload
+     *
      * @return array
      */
     public function assign(array $payload): array
@@ -57,8 +60,10 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
     }
 
     /**
-     * Get details
+     * Get details.
+     *
      * @param string $orderId
+     *
      * @return array
      */
     public function getDetails(string $orderId): array
@@ -67,8 +72,10 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
     }
 
     /**
-     * Cancel an assigned order from 3rd party service provider
+     * Cancel an assigned order from 3rd party service provider.
+     *
      * @param string $orderId
+     *
      * @return array
      */
     public function cancel(string $orderId): array
@@ -78,7 +85,9 @@ class OnDemandDelivery implements OnDemandDeliveryProvider
 
     /**
      * Get availability information of both in-house and 3rd party providers for specific pickup and delivery without creating an order.
+     *
      * @param array $payload
+     *
      * @return array
      */
     public function availability(array $payload): array

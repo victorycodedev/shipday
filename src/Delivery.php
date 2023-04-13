@@ -9,7 +9,6 @@ class Delivery implements DeliveryProvider
     use MakeRequest;
     /**
      * GuzzleHttp Client.
-     *
      */
     protected Client $client;
 
@@ -20,16 +19,17 @@ class Delivery implements DeliveryProvider
             'http_errors' => false,
             'headers'     => [
                 'Authorization'    => "Basic {$this->apiKey}",
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
+                'Content-Type'     => 'application/json',
+                'Accept'           => 'application/json',
             ],
         ]);
     }
 
     /**
-     * Insert order
+     * Insert order.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function insertOrder(array $payload): array
@@ -38,10 +38,11 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Update order
+     * Update order.
      *
      * @param string $orderId
-     * @param array $payload
+     * @param array  $payload
+     *
      * @return array
      */
     public function updateOrder(string $orderId, array $payload): array
@@ -50,7 +51,7 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Active orders
+     * Active orders.
      *
      * @return array
      */
@@ -60,9 +61,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Order details
+     * Order details.
      *
      * @param string $orderId
+     *
      * @return array
      */
     public function getOrderDetails(string $orderNumber): array
@@ -71,9 +73,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Query order
+     * Query order.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function queryOrder(array $payload): array
@@ -82,9 +85,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Delete order
+     * Delete order.
      *
      * @param string $orderId
+     *
      * @return array
      */
     public function deleteOrder(string $orderId): array
@@ -93,10 +97,11 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Assign order to driver
+     * Assign order to driver.
      *
      * @param string $orderId
      * @param string $carrierId
+     *
      * @return array
      */
     public function assignOrderToDriver(string $orderId, string $carrierId): array
@@ -105,10 +110,11 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Update order status
+     * Update order status.
      *
      * @param string $orderId
-     * @param array $payload
+     * @param array  $payload
+     *
      * @return array
      */
     public function updateOrderStatus(string $orderId, array $payload): array
@@ -117,9 +123,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Ready to pickup
+     * Ready to pickup.
      *
      * @param string $orderId
+     *
      * @return array
      */
     public function readyToPickup(string $orderId): array
@@ -128,9 +135,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Add driver
+     * Add driver.
      *
      * @param array $payload
+     *
      * @return array
      */
     public function addDriver(array $payload): array
@@ -139,7 +147,7 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * List of drivers
+     * List of drivers.
      *
      * @return array
      */
@@ -149,9 +157,10 @@ class Delivery implements DeliveryProvider
     }
 
     /**
-     * Delete driver
+     * Delete driver.
      *
      * @param string $carrierId
+     *
      * @return array
      */
     public function deleteDriver(string $carrierId): array

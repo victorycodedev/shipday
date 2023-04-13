@@ -2,9 +2,9 @@
 
 namespace Victorycodedev\Shipday;
 
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Victorycodedev\Shipday\Exceptions\BadRequestException;
-use \Exception;
 use Victorycodedev\Shipday\Exceptions\TooManyRequestException;
 use Victorycodedev\Shipday\Exceptions\UnauthorizedException;
 
@@ -12,7 +12,7 @@ trait MakeRequest
 {
     protected function request(string $method, string $uri, array $payload = []): array
     {
-        $response = $this->client->request($method, $uri,  empty($payload) ? [] : ['json' => $payload]);
+        $response = $this->client->request($method, $uri, empty($payload) ? [] : ['json' => $payload]);
 
         if (!$this->isSuccessful($response)) {
             return $this->handleError($response);
@@ -20,7 +20,6 @@ trait MakeRequest
 
         return json_decode($response->getBody(), true);
     }
-
 
     private function isSuccessful(ResponseInterface $response): bool
     {
