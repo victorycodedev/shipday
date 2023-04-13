@@ -123,7 +123,7 @@ Order Status Update
 ````php
 
 $response = $delivery->updateOrderStatus('ENTER ORDER ID', [
-    ...
+   'status' => 'STARTED',
 ]);
 
 ````
