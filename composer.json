@@ -1,0 +1,46 @@
+{
+    "name": "victorycodedev/shipday",
+    "description": "Shipday PHP sdk provides easier access to Shipday API's from PHP applications and scripts.",
+    "keywords": [
+        "MetaApi",
+        "victorycodedev",
+        "shipday",
+        "shipday-php-sdk"
+    ],
+    "type": "library",
+    "homepage": "https://github.com/victorycodedev/shipday",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Victorycodedev\\Shipday\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Victorycodedev\\Shipday\\Tests\\": "tests"
+        }
+    },
+    "authors": [{
+        "name": "Efekpogua Victory",
+        "email": "victrinhoj@gmail.com",
+        "homepage": "https://github.com/victorycodedev/shipday",
+        "role": "Developer"
+    }],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1|^8.2",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.3",
+        "mockery/mockery": "^1.5"
+    },
+    "scripts": {
+        "test": "./vendor/bin/pest"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
