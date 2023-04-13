@@ -18,6 +18,11 @@ trait MakeRequest
             return $this->handleError($response);
         }
 
+        //if $response->getBody() is empty, empty array will be returned
+        if (empty($response->getBody())) {
+            return [];
+        }
+
         return json_decode($response->getBody(), true);
     }
 
