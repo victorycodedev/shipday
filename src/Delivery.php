@@ -163,7 +163,7 @@ class Delivery implements DeliveryProvider
      *
      * @return array
      */
-    public function deleteDriver(string $carrierId): array
+    public function deleteDriver(string $carrierId): array|null
     {
         return $this->request('DELETE', "/carriers/{$carrierId}");
     }

@@ -38,5 +38,5 @@ interface DeliveryProvider
     public function drivers(): array;
 
     //delete driver
-    public function deleteDriver(string $carrierId): array;
+    public function deleteDriver(string $carrierId): array|null;
 }
