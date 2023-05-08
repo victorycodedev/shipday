@@ -174,7 +174,7 @@ class Delivery implements DeliveryProvider
     public function getDriverDetails(string $carrierId): array
     {
         $drivers = $this->drivers();
-        //loop through the drivers and return the driver with the carrierId
+
         foreach ($drivers as $driver) {
             if ($driver['id'] === intval($carrierId)) {
                 return $driver;
