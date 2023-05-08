@@ -88,7 +88,6 @@ class Delivery implements DeliveryProvider
      * Delete order.
      *
      * @param string $orderId
-     *
      */
     public function deleteOrder(string $orderId): array|null
     {
@@ -159,7 +158,6 @@ class Delivery implements DeliveryProvider
      * Delete driver.
      *
      * @param string $carrierId
-     *
      */
     public function deleteDriver(string $carrierId): array|null
     {
@@ -182,6 +180,7 @@ class Delivery implements DeliveryProvider
                 return $driver;
             }
         }
+
         return [];
     }
 }
