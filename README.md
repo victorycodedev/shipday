@@ -153,6 +153,14 @@ $drivers = $delivery->drivers();
 
 ````
 
+Retrieve a single Carrier
+
+````php
+
+$driver = $delivery->getDriverDetails('Enter carrierId');
+
+````
+
 Delete a carrier
 
 ````php
