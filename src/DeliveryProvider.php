@@ -20,7 +20,7 @@ interface DeliveryProvider
     public function queryOrder(array $payload): array;
 
     //delete order
-    public function deleteOrder(string $orderId): array;
+    public function deleteOrder(string $orderId): array|null;
 
     //assign order to driver
     public function assignOrderToDriver(string $orderId, string $carrierId): array;
@@ -39,4 +39,7 @@ interface DeliveryProvider
 
     //delete driver
     public function deleteDriver(string $carrierId): array|null;
+
+    //get driver details
+    public function getDriverDetails(string $carrierId): array;
 }

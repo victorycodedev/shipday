@@ -89,9 +89,8 @@ class Delivery implements DeliveryProvider
      *
      * @param string $orderId
      *
-     * @return array
      */
-    public function deleteOrder(string $orderId): array
+    public function deleteOrder(string $orderId): array|null
     {
         return $this->request('DELETE', "/orders/{$orderId}");
     }
@@ -161,10 +160,28 @@ class Delivery implements DeliveryProvider
      *
      * @param string $carrierId
      *
-     * @return array
      */
     public function deleteDriver(string $carrierId): array|null
     {
         return $this->request('DELETE', "/carriers/{$carrierId}");
+    }
+
+    /**
+     * Get driver details.
+     *
+     * @param string $carrierId
+     *
+     * @return array
+     */
+    public function getDriverDetails(string $carrierId): array
+    {
+        $drivers = $this->drivers();
+        //loop through the drivers and return the driver with the carrierId
+        foreach ($drivers as $driver) {
+            if ($driver['id'] === intval($carrierId)) {
+                return $driver;
+            }
+        }
+        return [];
     }
 }
