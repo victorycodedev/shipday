@@ -1,252 +1,348 @@
 # Shipday PHP SDK
 
-Shipday PHP sdk provides easier access to Shipday API's from PHP applications and scripts.
+A modern PHP SDK for the [Shipday API](https://docs.shipday.com/reference).
+
+The SDK requires PHP 8.3+ and uses a resource-based API:
+
+```php
+use Victorycodedev\Shipday\Shipday;
+use Victorycodedev\Shipday\Enums\OrderStatus;
+
+$shipday = Shipday::make('your-shipday-api-key');
+
+$order = $shipday->orders()->create([
+    'orderNumber' => 'A-1001',
+    'customerName' => 'Ada Lovelace',
+    'customerAddress' => '556 Crestlake Dr, San Francisco, CA 94132, USA',
+    'customerPhoneNumber' => '+14152392212',
+    'restaurantName' => 'Popeyes Louisiana Kitchen',
+    'restaurantAddress' => '890 Geneva Ave, San Francisco, CA 94112, United States',
+]);
+```
 
 ## Installation
-
-Use the package manager composer to install this package.
 
 ```bash
 composer require victorycodedev/shipday
 ```
 
-## Usage
+## Requirements
+
+- PHP 8.3+
+- Shipday API key
+
+Some generated Shipday examples also show an `x-api-key` header. The SDK does not send a literal `x-api-key: null` header, but you can include an `x-api-key` value when needed:
 
 ```php
-use Victorycodedev\Shipday\Delivery;
-
- $delivery = new Delivery($apiKey);
-
- // Sign up on https://www.shipday.com to grab your API key.
-
+$shipday = Shipday::make(
+    apiKey: 'your-shipday-api-key',
+    xApiKey: 'your-x-api-key',
+);
 ```
+
 ## Delivery Orders
 
-Insert Order
-
 ```php
+$shipday = Shipday::make('your-shipday-api-key');
 
-//INSERT AN ORDER
- $orderDetails = [
-        "orderNumber" => "99qT5A",
-        "customerName" => "Mr. Jhon Mason",
-        "customerAddress" => "556 Crestlake Dr, San Francisco, CA 94132, USA",
-        "customerEmail" => "jhonMason@gmail.com",
-        "customerPhoneNumber" => "+14152392212",
-        "restaurantName" => "Popeyes Louisiana Kitchen",
-        "restaurantAddress" => "890 Geneva Ave, San Francisco, CA 94112, United States",
-        "restaurantPhoneNumber" => "+14152392013",
-        "expectedDeliveryDate" => "2021-06-03",
-        "expectedPickupTime" => "17:45:00",
-        "expectedDeliveryTime" => "19:22:00",
-        "pickupLatitude" => 41.53867,
-        "pickupLongitude" => -72.0827,
-        "deliveryLatitude" => 41.53867,
-        "deliveryLongitude" => -72.0827,
-        "tips" => 2.5,
-        "tax" => 1.5,
-        "discountAmount" => 1.5,
-        "deliveryFee" => 3,
-        "totalOrderCost" => 13.47,
-        "deliveryInstruction" => "fast",
-        "orderSource" => "Seamless",
-        "additionalId" => "4532",
-        "clientRestaurantId" => 12,
-        "paymentMethod" => "credit_card",
-        "creditCardType" => "visa",
-        "creditCardId" => 1234
-    ];
-
- $order = $delivery->insertOrder($orderDetails);
+$shipday->orders()->active();
+$shipday->orders()->find('ORDER_NUMBER');
+$shipday->orders()->create([...]);
+$shipday->orders()->update($orderId, [...]);
+$shipday->orders()->delete($orderId);
+$shipday->orders()->query([...]);
+$shipday->orders()->assignDriver($orderId, $carrierId);
+$shipday->orders()->unassignDriver($orderId);
+$shipday->orders()->readyToPickup($orderId); // sends ["readyToPickup" => true]
+$shipday->orders()->updateStatus($orderId, OrderStatus::Started);
+// Raw strings are also accepted for forward compatibility:
+$shipday->orders()->updateStatus($orderId, 'STARTED');
 ```
 
-Edit/Update an Order
+## Pickup Orders
 
-````php
+```php
+$shipday->pickupOrders()->create([...]);
+$shipday->pickupOrders()->find($orderId);
+$shipday->pickupOrders()->update($orderId, [...]);
+$shipday->pickupOrders()->delete($orderId);
+```
 
-$orderId = 002002;
+## Carriers
 
-$details = [
-    'orderId' => $orderId,
-    ....
-];
+```php
+$shipday->carriers()->all();
 
-$response = $delivery->updateOrder($orderId, $details);
-
-````
-
-Retrieve Active Orders
-
-````php
-
-$orders = $delivery->getActiveOrders();
-
-````
-
-Retrieve Order Details
-
-````php
-
-$order = $delivery->getOrderDetails('test order 1')[0];
-
-
-````
-
-Orders Query
-
-````php
-
-$orders = $delivery->queryOrder([
-    ...
+$shipday->carriers()->create([
+    'name' => 'Jane Driver',
+    'email' => 'jane@example.com',
+    'phoneNumber' => '+11234567890',
 ]);
 
-````
+$shipday->carriers()->delete($carrierId);
+```
 
-Delete Order
+## Delivery Tracking
 
-````php
-
-$delivery->deleteOrder('ENTER ORDER ID');
-
-````
-
-Assign Order to Driver
-
-````php
-
-$delivery->assignOrderToDriver('ENTER ORDER ID', 'ENTER CARRIER ID');
-
-````
-
-Order Status Update
-
-````php
-
-$response = $delivery->updateOrderStatus('ENTER ORDER ID', [
-   'status' => 'STARTED',
-]);
-
-````
-
-Order Ready to Pickup
-
-````php
-
-$delivery->readyToPickup('ENTER ORDER ID');
-
-````
-
-
-Add a carrier/driver
-
-````php
-
-$driver = $delivery->addDriver([...]);
-
-````
-
-Retrieve Carriers
-
-````php
-
-$drivers = $delivery->drivers();
-
-````
-
-Retrieve a single Carrier
-
-````php
-
-$driver = $delivery->getDriverDetails('Enter carrierId');
-
-````
-
-Delete a carrier
-
-````php
-
-$response = $delivery->deleteDriver('CARRIER ID');
-
-````
+```php
+$shipday->tracking()->progress(
+    trackingId: 'tracking-id',
+    includeStaticData: true,
+);
+```
 
 ## On-Demand Delivery
 
 ```php
-use Victorycodedev\Shipday\OnDemandDelivery;
+$shipday->onDemand()->services();
+$shipday->onDemand()->estimate($orderId);
 
-$ondemandDelivery = new OnDemandDelivery($apiKey);
+$shipday->onDemand()->assign([
+    'name' => 'DoorDash',
+    'orderId' => $orderId,
+    'tip' => 6.50,
+    'estimateReference' => 'estimate-reference',
+    'contactlessDelivery' => false,
+    'podType' => 'PHOTO',
+]);
 
- // Sign up on https://www.shipday.com to grab your API key.
+$shipday->onDemand()->details($orderId);
+$shipday->onDemand()->cancel($orderId);
 
+$shipday->onDemand()->availability([
+    'pickupAddress' => '1 Wall St, New York, NY 10005, USA',
+    'deliveryAddress' => '1000 5th Ave, New York, NY 10028, USA',
+]);
 ```
 
-Services : Get a list of 3rd party delivery service providers available
+## Partner API
 
-````php
+Partner endpoints use a separate client because Shipday requires `PARTNER-API-KEY`.
 
-$response = $ondemandDelivery->services();
+```php
+use Victorycodedev\Shipday\PartnerShipday;
+use Victorycodedev\Shipday\Enums\PartnerOrderStatus;
 
-````
+$partner = PartnerShipday::make('your-partner-api-key');
 
-Estimate: Get estimate from 3rd party service providers (Service availability, Price, Wait time etc.)
-
-````php
-
-$response = $ondemandDelivery->estimate('ORDER ID');
-
-````
-
-Assign: Assign to a specific 3rd party delivery service provider. Usually, after getting an estimate.
-
-````php
-
-$response = $ondemandDelivery->assign([
-    //... KEY VALUE PAIR PAYLOAD
+$partner->orders()->query([
+    'companyId' => '1234',
+    'orderStatus' => PartnerOrderStatus::Active,
+    'startCursor' => 1,
+    'endCursor' => 25,
 ]);
+$partner->orders()->completed($companyId);
+$partner->members()->details();
+```
 
-````
+## Exceptions
 
-Details: Get order and status details for an assigned order to 3rd party service provider.
+The SDK uses one exception class:
 
-````php
+```php
+use Victorycodedev\Shipday\Exceptions\ShipdayException;
 
-$response = $ondemandDelivery->getDetails('ORDER ID');
+try {
+    $shipday->orders()->active();
+} catch (ShipdayException $exception) {
+    $exception->statusCode();
+    $exception->response();
+    $exception->headers();
+    $exception->errorId();
+    $exception->errorName();
+    $exception->details();
+    $exception->retryAfter();
+}
+```
 
-````
+## Enums
 
+The SDK includes enums for documented Shipday values while still accepting raw strings where forward compatibility matters.
 
-Cancel an assigned order 
+### Order Status
 
-````php
+Use `OrderStatus` when updating a delivery order status:
 
-$response = $ondemandDelivery->cancel('ORDER ID');
+```php
+use Victorycodedev\Shipday\Enums\OrderStatus;
 
-````
+$shipday->orders()->updateStatus($orderId, OrderStatus::Started);
+```
 
-Availaiblity: Get availability information
+Available cases:
 
-````php
+```php
+OrderStatus::Started;
+OrderStatus::PickedUp;
+OrderStatus::ReadyToDeliver;
+OrderStatus::AlreadyDelivered;
+OrderStatus::Incomplete;
+OrderStatus::FailedDelivery;
+```
 
-$response = $ondemandDelivery->availability([
-     //... KEY VALUE PAIR PAYLOAD
+### Partner Order Status
+
+Use `PartnerOrderStatus` when querying partner orders:
+
+```php
+use Victorycodedev\Shipday\Enums\PartnerOrderStatus;
+
+$partner->orders()->query([
+    'companyId' => '1234',
+    'orderStatus' => PartnerOrderStatus::Active,
 ]);
+```
 
+Available cases:
 
-````
+```php
+PartnerOrderStatus::Active;
+PartnerOrderStatus::NotAssigned;
+PartnerOrderStatus::NotAccepted;
+PartnerOrderStatus::NotStartedYet;
+PartnerOrderStatus::Started;
+PartnerOrderStatus::PickedUp;
+PartnerOrderStatus::ReadyToDeliver;
+PartnerOrderStatus::AlreadyDelivered;
+PartnerOrderStatus::FailedDelivery;
+PartnerOrderStatus::Incomplete;
+```
 
-## API Reference
-All API references can be found on shipday documentation website. https://docs.shipday.com/reference/shipday-api
+### Webhook Events
 
-## Security
-If you discover any security related issues, please open an issue.
+Webhook events expose both raw strings and enum helpers:
 
-## How can I thank you?
-Why not star the github repo? I'd love the attention! you can share the link for this repository on Twitter? 
+```php
+$event->event();
+$event->eventType();
+```
 
-Don't forget to [follow me on twitter!](https://twitter.com/EfekpoguaVicto4)
+Known event enum cases include:
 
-Thanks! Efekpogua Victory.
+```php
+WebhookEventType::OrderAssigned;
+WebhookEventType::OrderAcceptedAndStarted;
+WebhookEventType::OrderOnTheWay;
+WebhookEventType::OrderCompleted;
+WebhookEventType::OrderFailed;
+WebhookEventType::OrderIncomplete;
+WebhookEventType::OrderDeleted;
+WebhookEventType::OrderInserted;
+WebhookEventType::OrderPickedUp;
+WebhookEventType::OrderUnassigned;
+WebhookEventType::OrderPickedUpRemoved;
+WebhookEventType::OrderOnTheWayRemoved;
+WebhookEventType::OrderPodUpload;
+WebhookEventType::LocationUpdate;
+```
+
+Webhook order statuses expose:
+
+```php
+$event->status();
+$event->statusType();
+```
+
+Known status enum cases include:
+
+```php
+WebhookOrderStatus::NotAssigned;
+WebhookOrderStatus::NotAccepted;
+WebhookOrderStatus::NotStartedYet;
+WebhookOrderStatus::Started;
+WebhookOrderStatus::PickedUp;
+WebhookOrderStatus::ReadyToDeliver;
+WebhookOrderStatus::AlreadyDelivered;
+WebhookOrderStatus::Incomplete;
+WebhookOrderStatus::FailedDelivery;
+```
+
+## Webhooks
+
+Your application still receives the HTTP webhook request. The SDK helps validate the optional Shipday webhook token, decode the payload, detect the event type, and expose useful values.
+
+Shipday sends the validation token in a header named `token`.
+
+### Laravel Example
+
+```php
+use Illuminate\Http\Request;
+use Victorycodedev\Shipday\Enums\WebhookEventType;
+use Victorycodedev\Shipday\Enums\WebhookOrderStatus;
+use Victorycodedev\Shipday\Webhooks\DriverLocationUpdated;
+use Victorycodedev\Shipday\Webhooks\OrderStatusUpdated;
+use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
+
+Route::post('/webhooks/shipday', function (Request $request) {
+    $event = ShipdayWebhook::fromRequest(
+        payload: $request->getContent(),
+        headers: $request->headers->all(),
+        token: config('services.shipday.webhook_token'),
+    );
+
+    if ($event instanceof OrderStatusUpdated) {
+        $event->event();
+        $event->eventType(); // WebhookEventType::OrderCompleted
+        $event->status();
+        $event->statusType(); // WebhookOrderStatus::AlreadyDelivered
+        $event->orderId();
+        $event->orderNumber();
+        $event->order();
+        $event->carrier();
+    }
+
+    if ($event instanceof DriverLocationUpdated) {
+        $event->orderId();
+        $event->companyId();
+        $event->latitude();
+        $event->longitude();
+        $event->timestamp();
+    }
+
+    return response()->json(['received' => true]);
+});
+```
+
+### Plain PHP Example
+
+```php
+use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
+
+$event = ShipdayWebhook::fromGlobals(
+    token: $_ENV['SHIPDAY_WEBHOOK_TOKEN'] ?? null,
+);
+
+http_response_code(200);
+```
+
+The beta driver location webhook is supported through `DriverLocationUpdated`.
+
+## Testing
+
+This package uses [Pest](https://pestphp.com/).
+
+```bash
+composer test
+```
+
+## Upgrade Notes From v1
+
+The old `Delivery` and `OnDemandDelivery` classes are deprecated compatibility wrappers. New applications should use:
+
+```php
+$shipday = Shipday::make('your-shipday-api-key');
+```
+
+Method names changed to a resource style. For example:
+
+```php
+// v1
+$delivery->insertOrder($payload);
+
+// resource API
+$shipday->orders()->create($payload);
+```
 
 ## License
 
-[MIT](./LICENSE.md)
+[MIT](LICENSE.md)

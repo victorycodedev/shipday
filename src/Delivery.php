@@ -1,186 +1,133 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victorycodedev\Shipday;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use Victorycodedev\Shipday\Enums\OrderStatus;
 
-class Delivery implements DeliveryProvider
+/**
+ * @deprecated Use Shipday::make($apiKey)->orders() and ->carriers() instead.
+ */
+final readonly class Delivery
 {
-    use MakeRequest;
-    /**
-     * GuzzleHttp Client.
-     */
-    protected Client $client;
+    private Shipday $shipday;
 
-    public function __construct(protected string $apiKey, Client $client = null)
+    public function __construct(string $apiKey, ?ClientInterface $client = null)
     {
-        $this->client = $client ?? new Client([
-            'base_uri'    => 'https://api.shipday.com',
-            'http_errors' => false,
-            'headers'     => [
-                'Authorization'    => "Basic {$this->apiKey}",
-                'Content-Type'     => 'application/json',
-                'Accept'           => 'application/json',
-            ],
-        ]);
+        $this->shipday = Shipday::make($apiKey, client: $client);
     }
 
     /**
-     * Insert order.
+     * @param array<string, mixed> $payload
      *
-     * @param array $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function insertOrder(array $payload): array
     {
-        return $this->request('POST', '/orders', $payload);
+        return $this->shipday->orders()->create($payload);
     }
 
     /**
-     * Update order.
+     * @param array<string, mixed> $payload
      *
-     * @param string $orderId
-     * @param array  $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function updateOrder(string $orderId, array $payload): array
     {
-        return $this->request('PUT', "/order/edit/{$orderId}", $payload);
+        return $this->shipday->orders()->update($orderId, $payload);
     }
 
     /**
-     * Active orders.
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function getActiveOrders(): array
     {
-        return $this->request('GET', '/orders');
+        return $this->shipday->orders()->active();
     }
 
     /**
-     * Order details.
-     *
-     * @param string $orderId
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function getOrderDetails(string $orderNumber): array
     {
-        return $this->request('GET', "/orders/{$orderNumber}");
+        return $this->shipday->orders()->find($orderNumber);
     }
 
     /**
-     * Query order.
+     * @param array<string, mixed> $payload
      *
-     * @param array $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function queryOrder(array $payload): array
     {
-        return $this->request('POST', '/orders/query', $payload);
+        return $this->shipday->orders()->query($payload);
     }
 
     /**
-     * Delete order.
-     *
-     * @param string $orderId
+     * @return array<mixed>
      */
-    public function deleteOrder(string $orderId): array|null
+    public function deleteOrder(string $orderId): array
     {
-        return $this->request('DELETE', "/orders/{$orderId}");
+        return $this->shipday->orders()->delete($orderId);
     }
 
     /**
-     * Assign order to driver.
-     *
-     * @param string $orderId
-     * @param string $carrierId
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function assignOrderToDriver(string $orderId, string $carrierId): array
     {
-        return $this->request('PUT', "/orders/assign/{$orderId}/{$carrierId}");
+        return $this->shipday->orders()->assignDriver($orderId, $carrierId);
     }
 
     /**
-     * Update order status.
-     *
-     * @param string $orderId
-     * @param array  $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
-    public function updateOrderStatus(string $orderId, array $payload): array
+    public function unassignOrderFromDriver(string $orderId): array
     {
-        return $this->request('PUT', "/orders/{$orderId}/status", $payload);
+        return $this->shipday->orders()->unassignDriver($orderId);
     }
 
     /**
-     * Ready to pickup.
-     *
-     * @param string $orderId
-     *
-     * @return array
+     * @return array<mixed>
      */
-    public function readyToPickup(string $orderId): array
+    public function updateOrderStatus(string $orderId, OrderStatus|string $status): array
     {
-        return $this->request('PUT', "/orders/{$orderId}/meta");
+        return $this->shipday->orders()->updateStatus($orderId, $status);
     }
 
     /**
-     * Add driver.
+     * @return array<mixed>
+     */
+    public function readyToPickup(string $orderId, bool $ready = true): array
+    {
+        return $this->shipday->orders()->readyToPickup($orderId, $ready);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
      *
-     * @param array $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function addDriver(array $payload): array
     {
-        return $this->request('POST', '/carriers', $payload);
+        return $this->shipday->carriers()->create($payload);
     }
 
     /**
-     * List of drivers.
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function drivers(): array
     {
-        return $this->request('GET', '/carriers');
+        return $this->shipday->carriers()->all();
     }
 
     /**
-     * Delete driver.
-     *
-     * @param string $carrierId
+     * @return array<mixed>
      */
-    public function deleteDriver(string $carrierId): array|null
+    public function deleteDriver(string $carrierId): array
     {
-        return $this->request('DELETE', "/carriers/{$carrierId}");
-    }
-
-    /**
-     * Get driver details.
-     *
-     * @param string $carrierId
-     *
-     * @return array
-     */
-    public function getDriverDetails(string $carrierId): array
-    {
-        $drivers = $this->drivers();
-
-        foreach ($drivers as $driver) {
-            if ($driver['id'] === intval($carrierId)) {
-                return $driver;
-            }
-        }
-
-        return [];
+        return $this->shipday->carriers()->delete($carrierId);
     }
 }
