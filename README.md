@@ -2,7 +2,7 @@
 
 A modern PHP SDK for the [Shipday API](https://docs.shipday.com/reference).
 
-Version 2 requires PHP 8.3+ and uses a resource-based API:
+The SDK requires PHP 8.3+ and uses a resource-based API:
 
 ```php
 use Victorycodedev\Shipday\Shipday;
@@ -31,12 +31,6 @@ composer require victorycodedev/shipday
 - PHP 8.3+
 - Shipday API key
 
-Shipday authenticates regular API requests with:
-
-```http
-Authorization: Basic <API_KEY>
-```
-
 Some generated Shipday examples also show an `x-api-key` header. The SDK does not send a literal `x-api-key: null` header, but you can include an `x-api-key` value when needed:
 
 ```php
@@ -44,12 +38,6 @@ $shipday = Shipday::make(
     apiKey: 'your-shipday-api-key',
     xApiKey: 'your-x-api-key',
 );
-```
-
-Partner API requests use:
-
-```http
-PARTNER-API-KEY: <PARTNER_API_KEY>
 ```
 
 ## Delivery Orders
@@ -149,7 +137,7 @@ $partner->members()->details();
 
 ## Exceptions
 
-Version 2 uses one exception class:
+The SDK uses one exception class:
 
 ```php
 use Victorycodedev\Shipday\Exceptions\ShipdayException;
@@ -249,7 +237,7 @@ Method names changed to a resource style. For example:
 // v1
 $delivery->insertOrder($payload);
 
-// v2
+// resource API
 $shipday->orders()->create($payload);
 ```
 
