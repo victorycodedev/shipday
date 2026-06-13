@@ -1,97 +1,72 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Victorycodedev\Shipday;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
-class OnDemandDelivery implements OnDemandDeliveryProvider
+/**
+ * @deprecated Use Shipday::make($apiKey)->onDemand() instead.
+ */
+final readonly class OnDemandDelivery
 {
-    use MakeRequest;
-    /**
-     * GuzzleHttp Client.
-     */
-    protected Client $client;
+    private Shipday $shipday;
 
-    public function __construct(protected string $apiKey, Client $client = null)
+    public function __construct(string $apiKey, ?ClientInterface $client = null)
     {
-        $this->client = $client ?? new Client([
-            'base_uri'    => 'https://api.shipday.com',
-            'http_errors' => false,
-            'headers'     => [
-                'Authorization' => "Basic {$this->apiKey}",
-                'Content-Type'  => 'application/json',
-                'Accept'        => 'application/json',
-            ],
-        ]);
+        $this->shipday = Shipday::make($apiKey, client: $client);
     }
 
     /**
-     * Get a list of 3rd party delivery service providers available.
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function services(): array
     {
-        return $this->request('GET', '/on-demand/services');
+        return $this->shipday->onDemand()->services();
     }
 
     /**
-     * Estimate.
-     *
-     * @param string $orderId
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function estimate(string $orderId): array
     {
-        return $this->request('GET', "/on-demand/estimate/{$orderId}");
+        return $this->shipday->onDemand()->estimate($orderId);
     }
 
     /**
-     * Assign to a specific 3rd party delivery service provider.
+     * @param array<string, mixed> $payload
      *
-     * @param array $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function assign(array $payload): array
     {
-        return $this->request('POST', '/on-demand/assign', $payload);
+        return $this->shipday->onDemand()->assign($payload);
     }
 
     /**
-     * Get details.
-     *
-     * @param string $orderId
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function getDetails(string $orderId): array
     {
-        return $this->request('GET', "/on-demand/details/{$orderId}");
+        return $this->shipday->onDemand()->details($orderId);
     }
 
     /**
-     * Cancel an assigned order from 3rd party service provider.
-     *
-     * @param string $orderId
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function cancel(string $orderId): array
     {
-        return $this->request('POST', "/on-demand/cancel/{$orderId}");
+        return $this->shipday->onDemand()->cancel($orderId);
     }
 
     /**
-     * Get availability information of both in-house and 3rd party providers for specific pickup and delivery without creating an order.
+     * @param array<string, mixed> $payload
      *
-     * @param array $payload
-     *
-     * @return array
+     * @return array<mixed>
      */
     public function availability(array $payload): array
     {
-        return $this->request('POST', '/driver/availability', $payload);
+        return $this->shipday->onDemand()->availability($payload);
     }
 }

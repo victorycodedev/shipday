@@ -1,252 +1,236 @@
 # Shipday PHP SDK
 
-Shipday PHP sdk provides easier access to Shipday API's from PHP applications and scripts.
+A modern PHP SDK for the [Shipday API](https://docs.shipday.com/reference).
+
+Version 2 requires PHP 8.3+ and uses a resource-based API:
+
+```php
+use Victorycodedev\Shipday\Shipday;
+
+$shipday = Shipday::make('your-shipday-api-key');
+
+$order = $shipday->orders()->create([
+    'orderNumber' => 'A-1001',
+    'customerName' => 'Ada Lovelace',
+    'customerAddress' => '556 Crestlake Dr, San Francisco, CA 94132, USA',
+    'customerPhoneNumber' => '+14152392212',
+    'restaurantName' => 'Popeyes Louisiana Kitchen',
+    'restaurantAddress' => '890 Geneva Ave, San Francisco, CA 94112, United States',
+]);
+```
 
 ## Installation
-
-Use the package manager composer to install this package.
 
 ```bash
 composer require victorycodedev/shipday
 ```
 
-## Usage
+## Requirements
 
-```php
-use Victorycodedev\Shipday\Delivery;
+- PHP 8.3+
+- Shipday API key
 
- $delivery = new Delivery($apiKey);
+Shipday authenticates regular API requests with:
 
- // Sign up on https://www.shipday.com to grab your API key.
-
+```http
+Authorization: Basic <API_KEY>
 ```
+
+Partner API requests use:
+
+```http
+PARTNER-API-KEY: <PARTNER_API_KEY>
+```
+
 ## Delivery Orders
 
-Insert Order
-
 ```php
+$shipday = Shipday::make('your-shipday-api-key');
 
-//INSERT AN ORDER
- $orderDetails = [
-        "orderNumber" => "99qT5A",
-        "customerName" => "Mr. Jhon Mason",
-        "customerAddress" => "556 Crestlake Dr, San Francisco, CA 94132, USA",
-        "customerEmail" => "jhonMason@gmail.com",
-        "customerPhoneNumber" => "+14152392212",
-        "restaurantName" => "Popeyes Louisiana Kitchen",
-        "restaurantAddress" => "890 Geneva Ave, San Francisco, CA 94112, United States",
-        "restaurantPhoneNumber" => "+14152392013",
-        "expectedDeliveryDate" => "2021-06-03",
-        "expectedPickupTime" => "17:45:00",
-        "expectedDeliveryTime" => "19:22:00",
-        "pickupLatitude" => 41.53867,
-        "pickupLongitude" => -72.0827,
-        "deliveryLatitude" => 41.53867,
-        "deliveryLongitude" => -72.0827,
-        "tips" => 2.5,
-        "tax" => 1.5,
-        "discountAmount" => 1.5,
-        "deliveryFee" => 3,
-        "totalOrderCost" => 13.47,
-        "deliveryInstruction" => "fast",
-        "orderSource" => "Seamless",
-        "additionalId" => "4532",
-        "clientRestaurantId" => 12,
-        "paymentMethod" => "credit_card",
-        "creditCardType" => "visa",
-        "creditCardId" => 1234
-    ];
-
- $order = $delivery->insertOrder($orderDetails);
+$shipday->orders()->active();
+$shipday->orders()->find('ORDER_NUMBER');
+$shipday->orders()->create([...]);
+$shipday->orders()->update($orderId, [...]);
+$shipday->orders()->delete($orderId);
+$shipday->orders()->query([...]);
+$shipday->orders()->assignDriver($orderId, $carrierId);
+$shipday->orders()->unassignDriver($orderId);
+$shipday->orders()->readyToPickup($orderId);
+$shipday->orders()->updateStatus($orderId, 'STARTED');
 ```
 
-Edit/Update an Order
+## Pickup Orders
 
-````php
+```php
+$shipday->pickupOrders()->create([...]);
+$shipday->pickupOrders()->find($orderId);
+$shipday->pickupOrders()->update($orderId, [...]);
+$shipday->pickupOrders()->delete($orderId);
+```
 
-$orderId = 002002;
+## Carriers
 
-$details = [
-    'orderId' => $orderId,
-    ....
-];
+```php
+$shipday->carriers()->all();
 
-$response = $delivery->updateOrder($orderId, $details);
-
-````
-
-Retrieve Active Orders
-
-````php
-
-$orders = $delivery->getActiveOrders();
-
-````
-
-Retrieve Order Details
-
-````php
-
-$order = $delivery->getOrderDetails('test order 1')[0];
-
-
-````
-
-Orders Query
-
-````php
-
-$orders = $delivery->queryOrder([
-    ...
+$shipday->carriers()->create([
+    'name' => 'Jane Driver',
+    'email' => 'jane@example.com',
+    'phoneNumber' => '+11234567890',
 ]);
 
-````
+$shipday->carriers()->delete($carrierId);
+```
 
-Delete Order
+## Delivery Tracking
 
-````php
-
-$delivery->deleteOrder('ENTER ORDER ID');
-
-````
-
-Assign Order to Driver
-
-````php
-
-$delivery->assignOrderToDriver('ENTER ORDER ID', 'ENTER CARRIER ID');
-
-````
-
-Order Status Update
-
-````php
-
-$response = $delivery->updateOrderStatus('ENTER ORDER ID', [
-   'status' => 'STARTED',
-]);
-
-````
-
-Order Ready to Pickup
-
-````php
-
-$delivery->readyToPickup('ENTER ORDER ID');
-
-````
-
-
-Add a carrier/driver
-
-````php
-
-$driver = $delivery->addDriver([...]);
-
-````
-
-Retrieve Carriers
-
-````php
-
-$drivers = $delivery->drivers();
-
-````
-
-Retrieve a single Carrier
-
-````php
-
-$driver = $delivery->getDriverDetails('Enter carrierId');
-
-````
-
-Delete a carrier
-
-````php
-
-$response = $delivery->deleteDriver('CARRIER ID');
-
-````
+```php
+$shipday->tracking()->progress(
+    trackingId: 'tracking-id',
+    includeStaticData: true,
+);
+```
 
 ## On-Demand Delivery
 
 ```php
-use Victorycodedev\Shipday\OnDemandDelivery;
+$shipday->onDemand()->services();
+$shipday->onDemand()->estimate($orderId);
 
-$ondemandDelivery = new OnDemandDelivery($apiKey);
+$shipday->onDemand()->assign([
+    'name' => 'DoorDash',
+    'orderId' => $orderId,
+    'tip' => 6.50,
+    'estimateReference' => 'estimate-reference',
+    'contactlessDelivery' => false,
+    'podType' => 'PHOTO',
+]);
 
- // Sign up on https://www.shipday.com to grab your API key.
+$shipday->onDemand()->details($orderId);
+$shipday->onDemand()->cancel($orderId);
 
+$shipday->onDemand()->availability([
+    'pickupAddress' => '1 Wall St, New York, NY 10005, USA',
+    'deliveryAddress' => '1000 5th Ave, New York, NY 10028, USA',
+]);
 ```
 
-Services : Get a list of 3rd party delivery service providers available
+## Partner API
 
-````php
+Partner endpoints use a separate client because Shipday requires `PARTNER-API-KEY`.
 
-$response = $ondemandDelivery->services();
+```php
+use Victorycodedev\Shipday\PartnerShipday;
 
-````
+$partner = PartnerShipday::make('your-partner-api-key');
 
-Estimate: Get estimate from 3rd party service providers (Service availability, Price, Wait time etc.)
+$partner->orders()->completed();
+$partner->orders()->query([...]);
+$partner->members()->details();
+```
 
-````php
+## Exceptions
 
-$response = $ondemandDelivery->estimate('ORDER ID');
+Version 2 uses one exception class:
 
-````
+```php
+use Victorycodedev\Shipday\Exceptions\ShipdayException;
 
-Assign: Assign to a specific 3rd party delivery service provider. Usually, after getting an estimate.
+try {
+    $shipday->orders()->active();
+} catch (ShipdayException $exception) {
+    $exception->statusCode();
+    $exception->response();
+    $exception->headers();
+    $exception->errorId();
+    $exception->errorName();
+    $exception->details();
+    $exception->retryAfter();
+}
+```
 
-````php
+## Webhooks
 
-$response = $ondemandDelivery->assign([
-    //... KEY VALUE PAIR PAYLOAD
-]);
+Your application still receives the HTTP webhook request. The SDK helps validate the optional Shipday webhook token, decode the payload, detect the event type, and expose useful values.
 
-````
+Shipday sends the validation token in a header named `token`.
 
-Details: Get order and status details for an assigned order to 3rd party service provider.
+### Laravel Example
 
-````php
+```php
+use Illuminate\Http\Request;
+use Victorycodedev\Shipday\Webhooks\DriverLocationUpdated;
+use Victorycodedev\Shipday\Webhooks\OrderStatusUpdated;
+use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
 
-$response = $ondemandDelivery->getDetails('ORDER ID');
+Route::post('/webhooks/shipday', function (Request $request) {
+    $event = ShipdayWebhook::fromRequest(
+        payload: $request->getContent(),
+        headers: $request->headers->all(),
+        token: config('services.shipday.webhook_token'),
+    );
 
-````
+    if ($event instanceof OrderStatusUpdated) {
+        $event->event();
+        $event->status();
+        $event->orderId();
+        $event->orderNumber();
+        $event->order();
+        $event->carrier();
+    }
 
+    if ($event instanceof DriverLocationUpdated) {
+        $event->orderId();
+        $event->companyId();
+        $event->latitude();
+        $event->longitude();
+        $event->timestamp();
+    }
 
-Cancel an assigned order 
+    return response()->json(['received' => true]);
+});
+```
 
-````php
+### Plain PHP Example
 
-$response = $ondemandDelivery->cancel('ORDER ID');
+```php
+use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
 
-````
+$event = ShipdayWebhook::fromGlobals(
+    token: $_ENV['SHIPDAY_WEBHOOK_TOKEN'] ?? null,
+);
 
-Availaiblity: Get availability information
+http_response_code(200);
+```
 
-````php
+The beta driver location webhook is supported through `DriverLocationUpdated`.
 
-$response = $ondemandDelivery->availability([
-     //... KEY VALUE PAIR PAYLOAD
-]);
+## Testing
 
+This package uses [Pest](https://pestphp.com/).
 
-````
+```bash
+composer test
+```
 
-## API Reference
-All API references can be found on shipday documentation website. https://docs.shipday.com/reference/shipday-api
+## Upgrade Notes From v1
 
-## Security
-If you discover any security related issues, please open an issue.
+The old `Delivery` and `OnDemandDelivery` classes are deprecated compatibility wrappers. New applications should use:
 
-## How can I thank you?
-Why not star the github repo? I'd love the attention! you can share the link for this repository on Twitter? 
+```php
+$shipday = Shipday::make('your-shipday-api-key');
+```
 
-Don't forget to [follow me on twitter!](https://twitter.com/EfekpoguaVicto4)
+Method names changed to a resource style. For example:
 
-Thanks! Efekpogua Victory.
+```php
+// v1
+$delivery->insertOrder($payload);
+
+// v2
+$shipday->orders()->create($payload);
+```
 
 ## License
 
-[MIT](./LICENSE.md)
+[MIT](LICENSE.md)

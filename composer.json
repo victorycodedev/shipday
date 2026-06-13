@@ -1,15 +1,31 @@
 {
     "name": "victorycodedev/shipday",
-    "description": "Shipday PHP sdk provides easier access to Shipday API's from PHP applications and scripts.",
+    "description": "A modern PHP SDK for the Shipday API.",
     "keywords": [
-        "MetaApi",
-        "victorycodedev",
         "shipday",
-        "shipday-php-sdk"
+        "shipday-api",
+        "shipday-php-sdk",
+        "delivery",
+        "webhooks"
     ],
     "type": "library",
     "homepage": "https://github.com/victorycodedev/shipday",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Efekpogua Victory",
+            "email": "victrinhoj@gmail.com",
+            "homepage": "https://github.com/victorycodedev/shipday",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "guzzlehttp/guzzle": "^7.8"
+    },
+    "require-dev": {
+        "pestphp/pest": "^4.7"
+    },
     "autoload": {
         "psr-4": {
             "Victorycodedev\\Shipday\\": "src/"
@@ -17,30 +33,19 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Victorycodedev\\Shipday\\Tests\\": "tests"
+            "Victorycodedev\\Shipday\\Tests\\": "tests/"
         }
     },
-    "authors": [{
-        "name": "Efekpogua Victory",
-        "email": "victrinhoj@gmail.com",
-        "homepage": "https://github.com/victorycodedev/shipday",
-        "role": "Developer"
-    }],
-    "minimum-stability": "stable",
-    "require": {
-        "php": "^8.1|^8.2",
-        "guzzlehttp/guzzle": "^7.0"
-    },
-    "require-dev": {
-        "pestphp/pest": "^2.3",
-        "mockery/mockery": "^1.5"
-    },
     "scripts": {
-        "test": "./vendor/bin/pest"
+        "test": "pest",
+        "test:coverage": "pest --coverage"
     },
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
-        }
-    }
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
