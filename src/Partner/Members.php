@@ -13,12 +13,10 @@ final readonly class Members
     }
 
     /**
-     * @param array<string, mixed> $query
-     *
      * @return array<mixed>
      */
-    public function details(array $query = []): array
+    public function details(): array
     {
-        return $this->client->get('/partner/members', $query);
+        return $this->client->get('/partner/members');
     }
 }

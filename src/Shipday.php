@@ -18,9 +18,14 @@ final readonly class Shipday
 {
     public function __construct(private Client $client) {}
 
-    public static function make(string $apiKey, string $baseUri = Client::DEFAULT_BASE_URI, ?ClientInterface $client = null): self
+    public static function make(
+        string $apiKey,
+        string $baseUri = Client::DEFAULT_BASE_URI,
+        ?ClientInterface $client = null,
+        ?string $xApiKey = null,
+    ): self
     {
-        return new self(ClientFactory::make(new BasicAuth($apiKey), $baseUri, $client));
+        return new self(ClientFactory::make(new BasicAuth($apiKey, $xApiKey), $baseUri, $client));
     }
 
     public function orders(): Orders

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Victorycodedev\Shipday\Exceptions\ShipdayException;
+use Victorycodedev\Shipday\Enums\OrderStatus;
 
 it('creates a delivery order', function () {
     $history = [];
@@ -17,7 +18,28 @@ it('creates a delivery order', function () {
         ->and($request->getMethod())->toBe('POST')
         ->and((string) $request->getUri()->getPath())->toBe('/orders')
         ->and($request->getHeaderLine('Authorization'))->toBe('Basic test-api-key')
+        ->and($request->getHeaderLine('x-api-key'))->toBe('')
         ->and(json_decode((string) $request->getBody(), true))->toBe(['orderNumber' => 'A-1']);
+});
+
+it('can include an optional x api key header', function () {
+    $history = [];
+    $mock = new GuzzleHttp\Handler\MockHandler([
+        new GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'application/json'], '{"success":true}'),
+    ]);
+    $stack = GuzzleHttp\HandlerStack::create($mock);
+    $stack->push(GuzzleHttp\Middleware::history($history));
+
+    $shipday = Victorycodedev\Shipday\Shipday::make(
+        apiKey: 'test-api-key',
+        client: new GuzzleHttp\Client(['handler' => $stack, 'base_uri' => 'https://api.shipday.com']),
+        xApiKey: 'test-x-api-key',
+    );
+
+    $shipday->orders()->active();
+
+    expect($history[0]['request']->getHeaderLine('Authorization'))->toBe('Basic test-api-key')
+        ->and($history[0]['request']->getHeaderLine('x-api-key'))->toBe('test-x-api-key');
 });
 
 it('covers delivery order endpoints', function (string $method, string $path, Closure $call) {
@@ -42,6 +64,35 @@ it('covers delivery order endpoints', function (string $method, string $path, Cl
     'ready to pickup' => ['PUT', '/orders/123/meta', fn (Victorycodedev\Shipday\Shipday $shipday) => $shipday->orders()->readyToPickup(123)],
     'status update' => ['PUT', '/orders/123/status', fn (Victorycodedev\Shipday\Shipday $shipday) => $shipday->orders()->updateStatus(123, 'STARTED')],
 ]);
+
+it('accepts the order status enum when updating status', function () {
+    $history = [];
+    $shipday = shipdayWithResponses([
+        ['body' => '{"success":true,"orderId":123,"response":"UPDATED STATUS: PICKED_UP"}'],
+    ], $history);
+
+    $shipday->orders()->updateStatus(123, OrderStatus::PickedUp);
+    $request = $history[0]['request'];
+
+    expect($request->getMethod())->toBe('PUT')
+        ->and((string) $request->getUri()->getPath())->toBe('/orders/123/status')
+        ->and(json_decode((string) $request->getBody(), true))->toBe(['status' => 'PICKED_UP']);
+});
+
+it('sends ready to pickup payload required by shipday', function () {
+    $history = [];
+    $shipday = shipdayWithResponses([
+        ['status' => 202, 'body' => ''],
+    ], $history);
+
+    $response = $shipday->orders()->readyToPickup(123);
+    $request = $history[0]['request'];
+
+    expect($response)->toBe([])
+        ->and($request->getMethod())->toBe('PUT')
+        ->and((string) $request->getUri()->getPath())->toBe('/orders/123/meta')
+        ->and(json_decode((string) $request->getBody(), true))->toBe(['readyToPickup' => true]);
+});
 
 it('throws one rich exception for api errors', function () {
     $history = [];

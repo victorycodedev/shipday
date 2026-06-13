@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Victorycodedev\Shipday\Webhooks;
 
+use Victorycodedev\Shipday\Enums\WebhookOrderStatus;
+
 final readonly class OrderStatusUpdated extends WebhookEvent
 {
     public function timestamp(): ?int
@@ -14,6 +16,13 @@ final readonly class OrderStatusUpdated extends WebhookEvent
     public function status(): ?string
     {
         return isset($this->payload['order_status']) ? (string) $this->payload['order_status'] : null;
+    }
+
+    public function statusType(): ?WebhookOrderStatus
+    {
+        $status = $this->status();
+
+        return $status === null ? null : WebhookOrderStatus::tryFrom($status);
     }
 
     public function orderId(): ?int

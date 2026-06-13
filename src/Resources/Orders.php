@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Victorycodedev\Shipday\Resources;
 
+use Victorycodedev\Shipday\Enums\OrderStatus;
 use Victorycodedev\Shipday\Http\Client;
 
 final readonly class Orders
 {
-    public function __construct(private Client $client)
-    {
-    }
+    public function __construct(private Client $client) {}
 
     /**
      * @param array<string, mixed> $payload
@@ -89,19 +88,20 @@ final readonly class Orders
     /**
      * @return array<mixed>
      */
-    public function readyToPickup(string|int $orderId): array
+    public function readyToPickup(string|int $orderId, bool $ready = true): array
     {
-        return $this->client->put(sprintf('/orders/%s/meta', rawurlencode((string) $orderId)));
+        return $this->client->put(
+            sprintf('/orders/%s/meta', rawurlencode((string) $orderId)),
+            ['readyToPickup' => $ready],
+        );
     }
 
     /**
-     * @param array<string, mixed>|string $status
-     *
      * @return array<mixed>
      */
-    public function updateStatus(string|int $orderId, array|string $status): array
+    public function updateStatus(string|int $orderId, OrderStatus|string $status): array
     {
-        $payload = is_array($status) ? $status : ['status' => $status];
+        $payload = ['status' => $status instanceof OrderStatus ? $status->value : $status];
 
         return $this->client->put(sprintf('/orders/%s/status', rawurlencode((string) $orderId)), $payload);
     }

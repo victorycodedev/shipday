@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Victorycodedev\Shipday\Exceptions\ShipdayException;
+use Victorycodedev\Shipday\Enums\WebhookEventType;
+use Victorycodedev\Shipday\Enums\WebhookOrderStatus;
 use Victorycodedev\Shipday\Webhooks\DriverLocationUpdated;
 use Victorycodedev\Shipday\Webhooks\OrderStatusUpdated;
 use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
@@ -24,7 +26,9 @@ it('parses and validates order status webhooks', function () {
 
     expect($event)->toBeInstanceOf(OrderStatusUpdated::class)
         ->and($event->event())->toBe('ORDER_COMPLETED')
+        ->and($event->eventType())->toBe(WebhookEventType::OrderCompleted)
         ->and($event->status())->toBe('ALREADY_DELIVERED')
+        ->and($event->statusType())->toBe(WebhookOrderStatus::AlreadyDelivered)
         ->and($event->orderId())->toBe(123456)
         ->and($event->orderNumber())->toBe('808713698')
         ->and($event->carrier())->toBe(['id' => 134, 'name' => 'Jane Doe']);
@@ -42,6 +46,7 @@ it('parses beta driver location webhooks', function () {
 
     expect($event)->toBeInstanceOf(DriverLocationUpdated::class)
         ->and($event->event())->toBe('LOCATION_UPDATE')
+        ->and($event->eventType())->toBe(WebhookEventType::LocationUpdate)
         ->and($event->orderId())->toBe(12345)
         ->and($event->companyId())->toBe(67890)
         ->and($event->latitude())->toBe(37.7749)

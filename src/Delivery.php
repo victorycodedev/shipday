@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Victorycodedev\Shipday;
 
 use GuzzleHttp\ClientInterface;
+use Victorycodedev\Shipday\Enums\OrderStatus;
 
 /**
  * @deprecated Use Shipday::make($apiKey)->orders() and ->carriers() instead.
@@ -89,21 +90,19 @@ final readonly class Delivery
     }
 
     /**
-     * @param array<string, mixed>|string $payload
-     *
      * @return array<mixed>
      */
-    public function updateOrderStatus(string $orderId, array|string $payload): array
+    public function updateOrderStatus(string $orderId, OrderStatus|string $status): array
     {
-        return $this->shipday->orders()->updateStatus($orderId, $payload);
+        return $this->shipday->orders()->updateStatus($orderId, $status);
     }
 
     /**
      * @return array<mixed>
      */
-    public function readyToPickup(string $orderId): array
+    public function readyToPickup(string $orderId, bool $ready = true): array
     {
-        return $this->shipday->orders()->readyToPickup($orderId);
+        return $this->shipday->orders()->readyToPickup($orderId, $ready);
     }
 
     /**

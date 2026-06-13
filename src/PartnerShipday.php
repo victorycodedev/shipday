@@ -13,9 +13,7 @@ use Victorycodedev\Shipday\Partner\PartnerOrders;
 
 final readonly class PartnerShipday
 {
-    public function __construct(private Client $client)
-    {
-    }
+    public function __construct(private Client $client) {}
 
     public static function make(string $partnerApiKey, string $baseUri = Client::DEFAULT_BASE_URI, ?ClientInterface $client = null): self
     {

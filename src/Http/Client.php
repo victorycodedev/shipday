@@ -13,7 +13,7 @@ use Victorycodedev\Shipday\Exceptions\ShipdayException;
 
 final readonly class Client
 {
-    public const DEFAULT_BASE_URI = 'https://api.shipday.com';
+    public const string DEFAULT_BASE_URI = 'https://api.shipday.com';
 
     public function __construct(
         private ClientInterface $client,

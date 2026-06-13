@@ -6,6 +6,7 @@ Version 2 requires PHP 8.3+ and uses a resource-based API:
 
 ```php
 use Victorycodedev\Shipday\Shipday;
+use Victorycodedev\Shipday\Enums\OrderStatus;
 
 $shipday = Shipday::make('your-shipday-api-key');
 
@@ -36,6 +37,15 @@ Shipday authenticates regular API requests with:
 Authorization: Basic <API_KEY>
 ```
 
+Some generated Shipday examples also show an `x-api-key` header. The SDK does not send a literal `x-api-key: null` header, but you can include an `x-api-key` value when needed:
+
+```php
+$shipday = Shipday::make(
+    apiKey: 'your-shipday-api-key',
+    xApiKey: 'your-x-api-key',
+);
+```
+
 Partner API requests use:
 
 ```http
@@ -55,7 +65,9 @@ $shipday->orders()->delete($orderId);
 $shipday->orders()->query([...]);
 $shipday->orders()->assignDriver($orderId, $carrierId);
 $shipday->orders()->unassignDriver($orderId);
-$shipday->orders()->readyToPickup($orderId);
+$shipday->orders()->readyToPickup($orderId); // sends ["readyToPickup" => true]
+$shipday->orders()->updateStatus($orderId, OrderStatus::Started);
+// Raw strings are also accepted for forward compatibility:
 $shipday->orders()->updateStatus($orderId, 'STARTED');
 ```
 
@@ -121,11 +133,17 @@ Partner endpoints use a separate client because Shipday requires `PARTNER-API-KE
 
 ```php
 use Victorycodedev\Shipday\PartnerShipday;
+use Victorycodedev\Shipday\Enums\PartnerOrderStatus;
 
 $partner = PartnerShipday::make('your-partner-api-key');
 
-$partner->orders()->completed();
-$partner->orders()->query([...]);
+$partner->orders()->query([
+    'companyId' => '1234',
+    'orderStatus' => PartnerOrderStatus::Active,
+    'startCursor' => 1,
+    'endCursor' => 25,
+]);
+$partner->orders()->completed($companyId);
 $partner->members()->details();
 ```
 
@@ -159,6 +177,8 @@ Shipday sends the validation token in a header named `token`.
 
 ```php
 use Illuminate\Http\Request;
+use Victorycodedev\Shipday\Enums\WebhookEventType;
+use Victorycodedev\Shipday\Enums\WebhookOrderStatus;
 use Victorycodedev\Shipday\Webhooks\DriverLocationUpdated;
 use Victorycodedev\Shipday\Webhooks\OrderStatusUpdated;
 use Victorycodedev\Shipday\Webhooks\ShipdayWebhook;
@@ -172,7 +192,9 @@ Route::post('/webhooks/shipday', function (Request $request) {
 
     if ($event instanceof OrderStatusUpdated) {
         $event->event();
+        $event->eventType(); // WebhookEventType::OrderCompleted
         $event->status();
+        $event->statusType(); // WebhookOrderStatus::AlreadyDelivered
         $event->orderId();
         $event->orderNumber();
         $event->order();

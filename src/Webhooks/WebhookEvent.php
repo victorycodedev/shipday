@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Victorycodedev\Shipday\Webhooks;
 
+use Victorycodedev\Shipday\Enums\WebhookEventType;
+
 abstract readonly class WebhookEvent
 {
     /**
@@ -16,6 +18,13 @@ abstract readonly class WebhookEvent
     public function event(): ?string
     {
         return isset($this->payload['event']) ? (string) $this->payload['event'] : null;
+    }
+
+    public function eventType(): ?WebhookEventType
+    {
+        $event = $this->event();
+
+        return $event === null ? null : WebhookEventType::tryFrom($event);
     }
 
     /**

@@ -13,6 +13,7 @@ final readonly class PartnerAuth implements Authenticator
     /**
      * @return array<string, string>
      */
+    #[\Override]
     public function headers(): array
     {
         return [
