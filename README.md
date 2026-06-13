@@ -155,6 +155,108 @@ try {
 }
 ```
 
+## Enums
+
+The SDK includes enums for documented Shipday values while still accepting raw strings where forward compatibility matters.
+
+### Order Status
+
+Use `OrderStatus` when updating a delivery order status:
+
+```php
+use Victorycodedev\Shipday\Enums\OrderStatus;
+
+$shipday->orders()->updateStatus($orderId, OrderStatus::Started);
+```
+
+Available cases:
+
+```php
+OrderStatus::Started;
+OrderStatus::PickedUp;
+OrderStatus::ReadyToDeliver;
+OrderStatus::AlreadyDelivered;
+OrderStatus::Incomplete;
+OrderStatus::FailedDelivery;
+```
+
+### Partner Order Status
+
+Use `PartnerOrderStatus` when querying partner orders:
+
+```php
+use Victorycodedev\Shipday\Enums\PartnerOrderStatus;
+
+$partner->orders()->query([
+    'companyId' => '1234',
+    'orderStatus' => PartnerOrderStatus::Active,
+]);
+```
+
+Available cases:
+
+```php
+PartnerOrderStatus::Active;
+PartnerOrderStatus::NotAssigned;
+PartnerOrderStatus::NotAccepted;
+PartnerOrderStatus::NotStartedYet;
+PartnerOrderStatus::Started;
+PartnerOrderStatus::PickedUp;
+PartnerOrderStatus::ReadyToDeliver;
+PartnerOrderStatus::AlreadyDelivered;
+PartnerOrderStatus::FailedDelivery;
+PartnerOrderStatus::Incomplete;
+```
+
+### Webhook Events
+
+Webhook events expose both raw strings and enum helpers:
+
+```php
+$event->event();
+$event->eventType();
+```
+
+Known event enum cases include:
+
+```php
+WebhookEventType::OrderAssigned;
+WebhookEventType::OrderAcceptedAndStarted;
+WebhookEventType::OrderOnTheWay;
+WebhookEventType::OrderCompleted;
+WebhookEventType::OrderFailed;
+WebhookEventType::OrderIncomplete;
+WebhookEventType::OrderDeleted;
+WebhookEventType::OrderInserted;
+WebhookEventType::OrderPickedUp;
+WebhookEventType::OrderUnassigned;
+WebhookEventType::OrderPickedUpRemoved;
+WebhookEventType::OrderOnTheWayRemoved;
+WebhookEventType::OrderPodUpload;
+WebhookEventType::LocationUpdate;
+```
+
+Webhook order statuses expose:
+
+```php
+$event->status();
+$event->statusType();
+```
+
+Known status enum cases include:
+
+```php
+WebhookOrderStatus::NotAssigned;
+WebhookOrderStatus::NotAccepted;
+WebhookOrderStatus::NotStartedYet;
+WebhookOrderStatus::Started;
+WebhookOrderStatus::PickedUp;
+WebhookOrderStatus::ReadyToDeliver;
+WebhookOrderStatus::AlreadyDelivered;
+WebhookOrderStatus::Incomplete;
+WebhookOrderStatus::FailedDelivery;
+```
+
 ## Webhooks
 
 Your application still receives the HTTP webhook request. The SDK helps validate the optional Shipday webhook token, decode the payload, detect the event type, and expose useful values.
